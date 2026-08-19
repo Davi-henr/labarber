@@ -1,0 +1,203 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  BARBEIRO
+}
+
+enum StatusAgendamento {
+  PENDENTE
+  CONFIRMADO
+  CONCLUIDO
+  FALTOU
+  CANCELADO
+}
+
+enum TipoAusencia {
+  FOLGA
+  TRABALHO
+}
+
+model Barbearia {
+  id                 String    @id @default(uuid()) @db.Uuid
+  nome               String    @db.VarChar(255)
+  logo_url           String?   @db.VarChar(500)
+  cor_primaria       String?   @db.VarChar(7)
+  cor_secundaria     String?   @db.VarChar(7)
+  endereco           String?   @db.VarChar(500)
+  historia_texto     String?   @db.Text
+  dias_funcionamento String?   @db.VarChar(50)
+  horario_abertura   DateTime? @db.Time
+  horario_fechamento DateTime? @db.Time
+  instancia_whatsapp String?   @unique @db.VarChar(100)
+  whatsapp_conectado Boolean   @default(false)
+  criado_em          DateTime  @default(now()) @db.Timestamptz
+  atualizado_em      DateTime  @updatedAt @db.Timestamptz
+
+  usuarios     Usuario[]
+  clientes     Cliente[]
+  servicos     Servico[]
+  agendamentos Agendamento[]
+  ausencias    Ausencia[]
+  portfolio    PortfolioCorte[]
+
+  @@map("barbearias")
+}
+
+model Usuario {
+  id                      String   @id @default(uuid()) @db.Uuid
+  barbearia_id            String   @db.Uuid
+  nome                    String   @db.VarChar(255)
+  email                   String?  @unique @db.VarChar(255)
+  login                   String   @db.VarChar(100)
+  senha_hash              String   @db.VarChar(255)
+  whatsapp                String?  @db.VarChar(20)
+  foto_url                String?  @db.VarChar(500)
+  role                    Role
+  precisa_redefinir_senha Boolean  @default(true)
+  permissoes              Json?
+  ativo                   Boolean  @default(true)
+  comissao_percentual     Decimal  @default(0.00) @db.Decimal(5, 2)
+  criado_em               DateTime @default(now()) @db.Timestamptz
+  atualizado_em           DateTime @updatedAt @db.Timestamptz
+
+  barbearia    Barbearia     @relation(fields: [barbearia_id], references: [id], onDelete: Cascade)
+  agendamentos Agendamento[]
+  escalas      BarbeiroEscala[]
+  ausencias    Ausencia[]
+
+  @@unique([barbearia_id, login])
+  @@index([barbearia_id])
+  @@map("usuarios")
+}
+
+model BarbeiroEscala {
+  id              String   @id @default(uuid()) @db.Uuid
+  barbeiro_id     String   @db.Uuid
+  dia_semana      Int      @db.SmallInt // 0=Dom, 1=Seg...
+  
+  turno1_inicio   DateTime @db.Time
+  turno1_fim      DateTime @db.Time
+  
+  // Turno 2 opcional (ex: quem trabalha direto e não tem pausa, preenche só turno1)
+  turno2_inicio   DateTime? @db.Time
+  turno2_fim      DateTime? @db.Time
+
+  ativo           Boolean  @default(true)
+
+  barbeiro        Usuario  @relation(fields: [barbeiro_id], references: [id], onDelete: Cascade)
+
+  @@unique([barbeiro_id, dia_semana])
+  @@index([barbeiro_id])
+  @@map("barbeiro_escala")
+}
+
+model Ausencia {
+  id              String       @id @default(uuid()) @db.Uuid
+  barbearia_id    String       @db.Uuid
+  barbeiro_id     String?      @db.Uuid // Null = Feriado global da barbearia
+  data            DateTime     @db.Date // YYYY-MM-DD
+  descricao       String       @db.VarChar(255)
+  tipo            TipoAusencia @default(FOLGA)
+
+  // Opcionais: Se for TRABALHO, define a escala específica do dia
+  turno1_inicio   DateTime?    @db.Time
+  turno1_fim      DateTime?    @db.Time
+  turno2_inicio   DateTime?    @db.Time
+  turno2_fim      DateTime?    @db.Time
+
+  barbearia       Barbearia @relation(fields: [barbearia_id], references: [id], onDelete: Cascade)
+  barbeiro        Usuario?  @relation(fields: [barbeiro_id], references: [id], onDelete: Cascade)
+
+  @@index([barbearia_id])
+  @@index([barbeiro_id])
+  @@map("ausencias")
+}
+
+model Cliente {
+  id            String   @id @default(uuid()) @db.Uuid
+  barbearia_id  String   @db.Uuid
+  nome          String   @db.VarChar(255)
+  whatsapp      String   @db.VarChar(20)
+  criado_em     DateTime @default(now()) @db.Timestamptz
+  atualizado_em DateTime @updatedAt @db.Timestamptz
+
+  barbearia    Barbearia     @relation(fields: [barbearia_id], references: [id], onDelete: Cascade)
+  agendamentos Agendamento[]
+
+  @@unique([barbearia_id, whatsapp])
+  @@index([barbearia_id])
+  @@map("clientes")
+}
+
+model Servico {
+  id                      String   @id @default(uuid()) @db.Uuid
+  barbearia_id            String   @db.Uuid
+  nome                    String   @db.VarChar(255)
+  descricao               String?  @db.Text
+  valor                   Decimal  @db.Decimal(10, 2)
+  tempo_duracao_minutos   Int
+  ativo                   Boolean  @default(true)
+  criado_em               DateTime @default(now()) @db.Timestamptz
+  atualizado_em           DateTime @updatedAt @db.Timestamptz
+
+  barbearia    Barbearia     @relation(fields: [barbearia_id], references: [id], onDelete: Cascade)
+  agendamentos Agendamento[]
+
+  @@index([barbearia_id])
+  @@map("servicos")
+}
+
+model Agendamento {
+  id             String            @id @default(uuid()) @db.Uuid
+  barbearia_id   String            @db.Uuid
+  cliente_id     String            @db.Uuid
+  barbeiro_id    String            @db.Uuid
+  servico_id     String            @db.Uuid
+  data_hora_inicio DateTime        @db.Timestamptz
+  data_hora_fim    DateTime        @db.Timestamptz
+  status         StatusAgendamento
+  valor_cobrado  Decimal           @db.Decimal(10, 2)
+  valor_comissao Decimal           @db.Decimal(10, 2)
+  lembrete_enviado Boolean         @default(false)
+  criado_em      DateTime          @default(now()) @db.Timestamptz
+  atualizado_em  DateTime          @updatedAt @db.Timestamptz
+
+  barbearia Barbearia @relation(fields: [barbearia_id], references: [id], onDelete: Cascade)
+  cliente   Cliente   @relation(fields: [cliente_id], references: [id], onDelete: Restrict)
+  barbeiro  Usuario   @relation(fields: [barbeiro_id], references: [id], onDelete: Restrict)
+  servico   Servico   @relation(fields: [servico_id], references: [id], onDelete: Restrict)
+
+  @@index([barbearia_id])
+  @@index([barbeiro_id, data_hora_inicio])
+  @@map("agendamentos")
+}
+
+model PortfolioCorte {
+  id            String   @id @default(uuid()) @db.Uuid
+  barbearia_id  String   @db.Uuid
+  imagem_url    String   @db.VarChar(500)
+  legenda       String?  @db.VarChar(255)
+  criado_em     DateTime @default(now()) @db.Timestamptz
+
+  barbearia     Barbearia @relation(fields: [barbearia_id], references: [id], onDelete: Cascade)
+
+  @@index([barbearia_id])
+  @@map("portfolio_cortes")
+}
+
+model SuperAdmin {
+  id         String   @id @default(uuid()) @db.Uuid
+  email      String   @unique @db.VarChar(255)
+  senha_hash String   @db.VarChar(255)
+  criado_em  DateTime @default(now()) @db.Timestamptz
+
+  @@map("super_admins")
+}
+
