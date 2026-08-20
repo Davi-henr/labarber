@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../contexts/AuthContext';
-import { LogOut, Home, Users, Scissors, Calendar, Clock, Settings, Image as ImageIcon, Smartphone } from 'lucide-react';
+import { LogOut, Home, Users, Scissors, Calendar, Clock, Settings, Image as ImageIcon, Smartphone, Menu, X } from 'lucide-react';
 
 interface BarbeariaConfig {
   nome: string;
@@ -13,6 +13,7 @@ export function DashboardLayout() {
   const { user, logout } = useAuth();
   const location = useLocation();
   const [config, setConfig] = useState<BarbeariaConfig | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     async function loadConfig() {
@@ -32,10 +33,23 @@ export function DashboardLayout() {
   const linkClass = (path: string) => `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive(path) ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`;
 
   return (
-    <div className="flex h-screen bg-slate-100">
-      {/* Sidebar - Desktop */}
-      <aside className="w-64 bg-slate-900 text-white flex-col hidden md:flex">
-        <div className="h-16 flex items-center justify-center border-b border-slate-800">
+    <div className="flex h-screen bg-slate-100 relative">
+      
+      {/* Mobile Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside className={`
+        fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white flex flex-col transform transition-transform duration-300 ease-in-out
+        md:relative md:translate-x-0
+        ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}>
+        <div className="h-16 flex items-center justify-between px-4 border-b border-slate-800">
           <div className="flex items-center gap-2">
             {config?.logo_url ? (
               <img src={`${import.meta.env.PROD ? '/api' : 'http://localhost:3333'}${config.logo_url}`} alt="Logo" className="w-8 h-8 rounded-full object-cover" />
@@ -44,9 +58,15 @@ export function DashboardLayout() {
             )}
             <h1 className="text-xl font-bold tracking-wider truncate max-w-[140px]">{config?.nome || 'LA BARBER'}</h1>
           </div>
+          <button 
+            className="md:hidden text-slate-400 hover:text-white"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            <X size={24} />
+          </button>
         </div>
         
-        <nav className="flex-1 px-4 py-6 space-y-2">
+        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto" onClick={() => setIsMobileMenuOpen(false)}>
           {(user?.role === 'ADMIN' || user?.permissoes?.dashboard) && (
             <Link to="/dashboard" className={linkClass('/dashboard')}>
               <Home size={20} />
@@ -121,16 +141,24 @@ export function DashboardLayout() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col overflow-hidden">
+      <main className="flex-1 flex flex-col overflow-hidden w-full">
         {/* Mobile Header */}
-        <header className="md:hidden h-16 bg-white border-b flex items-center justify-between px-4">
-          <div className="flex items-center gap-2">
-            {config?.logo_url ? (
-              <img src={`${import.meta.env.PROD ? '/api' : 'http://localhost:3333'}${config.logo_url}`} alt="Logo" className="w-8 h-8 rounded-full object-cover" />
-            ) : (
-              <Scissors className="text-slate-900" size={24} />
-            )}
-            <h1 className="text-xl font-bold text-slate-900 truncate max-w-[150px]">{config?.nome || 'LA BARBER'}</h1>
+        <header className="md:hidden h-16 bg-white border-b flex items-center justify-between px-4 shrink-0">
+          <div className="flex items-center gap-3">
+            <button 
+              className="text-slate-600 hover:text-slate-900"
+              onClick={() => setIsMobileMenuOpen(true)}
+            >
+              <Menu size={24} />
+            </button>
+            <div className="flex items-center gap-2">
+              {config?.logo_url ? (
+                <img src={`${import.meta.env.PROD ? '/api' : 'http://localhost:3333'}${config.logo_url}`} alt="Logo" className="w-8 h-8 rounded-full object-cover" />
+              ) : (
+                <Scissors className="text-slate-900" size={24} />
+              )}
+              <h1 className="text-xl font-bold text-slate-900 truncate max-w-[150px]">{config?.nome || 'LA BARBER'}</h1>
+            </div>
           </div>
           <button onClick={logout} className="text-slate-600">
             <LogOut size={24} />
