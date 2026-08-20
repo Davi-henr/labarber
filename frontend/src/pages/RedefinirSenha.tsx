@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import { api, useAuth } from '../contexts/AuthContext';
 import { Lock, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -8,7 +8,7 @@ export function RedefinirSenha() {
   const [senhaNova, setSenhaNova] = useState('');
   const [senhaConfirmacao, setSenhaConfirmacao] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  
   const { user, logout } = useAuth();
 
   const handleRedefinir = async (e: React.FormEvent) => {

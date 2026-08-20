@@ -90,7 +90,7 @@ export function LandingPage() {
 
   const { barbearia, barbeiros, portfolio } = info;
   const logoSrc = barbearia.logo_url ? `http://localhost:3333${barbearia.logo_url}` : null;
-  const themeColor = barbearia.cor_primaria || '#EAB308'; // default para yellow-500
+  // const themeColor = barbearia.cor_primaria || '#EAB308'; // default para yellow-500
 
   const handleAgendar = () => {
     navigate(`/b/${barbearia_id}/agendar`);

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../contexts/AuthContext';
-import { Plus, Users, UserCircle, Key, Info, X, Loader2, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Users, UserCircle, Info, X, Loader2, Edit2, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface Usuario {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth, api } from '../contexts/AuthContext';
 import { QrCode, Trash2, CheckCircle, RefreshCw, Smartphone } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -34,7 +34,7 @@ export function WhatsAppConfig() {
   useEffect(() => {
     fetchStatus();
     // Poll status every 5 seconds if we have a QR code generated to detect scan
-    let interval: NodeJS.Timeout;
+    let interval: number;
     if (qrCode) {
       interval = setInterval(fetchStatus, 5000);
     }

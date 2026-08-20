@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { api, useAuth } from '../contexts/AuthContext';
 import { Users, Search, MessageCircle, Calendar as CalendarIcon, Loader2, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';

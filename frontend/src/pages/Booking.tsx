@@ -17,6 +17,7 @@ interface Servico {
 interface Barbeiro {
   id: string;
   nome: string;
+  foto_url?: string;
 }
 
 interface BarbeariaInfo {

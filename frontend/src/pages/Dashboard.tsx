@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth, api } from '../contexts/AuthContext';
 import { DollarSign, Scissors, Target, Users, TrendingUp, Calendar as CalendarIcon, Clock, MessageCircle } from 'lucide-react';
 import { format } from 'date-fns';
