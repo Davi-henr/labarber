@@ -4,18 +4,36 @@ import { GetBarbeariaInfoService } from '../services/GetBarbeariaInfoService';
 import { GetHorariosLivresService } from '../services/GetHorariosLivresService';
 import { CreateAgendamentoService } from '../services/CreateAgendamentoService';
 
+import { prisma } from '../../../config/prisma';
+import { AppError } from '../../../shared/errors/AppError';
+
 export class ChatbotController {
+  private async resolveId(id_ou_slug: string): Promise<string> {
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id_ou_slug);
+    if (isUuid) return id_ou_slug;
+
+    const barbearia = await prisma.barbearia.findUnique({
+      where: { slug: id_ou_slug },
+      select: { id: true }
+    });
+
+    if (!barbearia) throw new AppError('Barbearia não encontrada', 404);
+    return barbearia.id;
+  }
+
   async info(request: Request, response: Response) {
     const { id } = request.params;
+    const realId = await this.resolveId(id);
 
     const getInfo = new GetBarbeariaInfoService();
-    const info = await getInfo.execute(id);
+    const info = await getInfo.execute(realId);
 
     return response.json(info);
   }
 
   async horariosLivres(request: Request, response: Response) {
     const { id } = request.params;
+    const realId = await this.resolveId(id);
     const { data, servico_id, barbeiro_id } = request.query;
 
     const querySchema = z.object({
@@ -28,7 +46,7 @@ export class ChatbotController {
 
     const getHorarios = new GetHorariosLivresService();
     const horarios = await getHorarios.execute({
-      barbearia_id: id,
+      barbearia_id: realId,
       ...validatedQuery,
     });
 
@@ -37,6 +55,7 @@ export class ChatbotController {
 
   async agendar(request: Request, response: Response) {
     const { id } = request.params;
+    const realId = await this.resolveId(id);
 
     const agendarSchema = z.object({
       nome_cliente: z.string().min(1, 'Nome obrigatório'),
@@ -51,7 +70,7 @@ export class ChatbotController {
 
     const createAgendamento = new CreateAgendamentoService();
     const agendamento = await createAgendamento.execute({
-      barbearia_id: id,
+      barbearia_id: realId,
       ...validatedData,
     });
 

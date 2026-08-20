@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 interface Barbearia {
   id: string;
   nome: string;
+  slug: string;
   criado_em: string;
   _count: {
     usuarios: number;
@@ -28,6 +29,7 @@ export function MasterDashboard() {
 
   // Form State
   const [nomeBarbearia, setNomeBarbearia] = useState('');
+  const [slugBarbearia, setSlugBarbearia] = useState('');
   const [adminNome, setAdminNome] = useState('');
   const [adminEmail, setAdminEmail] = useState('');
   const [adminLogin, setAdminLogin] = useState('');
@@ -71,23 +73,23 @@ export function MasterDashboard() {
     try {
       await api.post('/saas/barbearias', {
         nome: nomeBarbearia,
+        slug: slugBarbearia,
         admin_nome: adminNome,
         admin_email: adminEmail,
         admin_login: adminLogin,
         admin_senha: adminSenha,
       });
 
-      toast.success('Barbearia e Mensalista criados com sucesso!');
+      toast.success('Barbearia criada com sucesso!');
       setIsModalOpen(false);
+      fetchBarbearias();
       
-      // Reset form
       setNomeBarbearia('');
+      setSlugBarbearia('');
       setAdminNome('');
       setAdminEmail('');
       setAdminLogin('');
       setAdminSenha('');
-      
-      fetchBarbearias();
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Erro ao criar barbearia');
     } finally {
@@ -215,7 +217,9 @@ export function MasterDashboard() {
                     <tr key={b.id} className="hover:bg-gray-50/50 transition-colors">
                       <td className="px-6 py-4">
                         <div className="font-bold text-gray-900">{b.nome}</div>
-                        <div className="text-sm text-gray-500 font-mono text-xs mt-1">{b.id}</div>
+                        <div className="text-sm text-gray-500 font-mono text-xs mt-1 text-indigo-600">
+                          /b/{b.slug}
+                        </div>
                       </td>
                       <td className="px-6 py-4">
                         {b.usuarios[0] ? (
@@ -271,18 +275,34 @@ export function MasterDashboard() {
             </div>
             
             <form onSubmit={handleSubmit} className="p-6">
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-1">Nome da Barbearia</label>
-                  <input
-                    type="text"
-                    required
-                    value={nomeBarbearia}
-                    onChange={e => setNomeBarbearia(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-transparent outline-none"
-                    placeholder="Ex: Barbearia Vintage"
-                  />
-                </div>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-1">Nome da Barbearia</label>
+                      <input
+                        type="text"
+                        required
+                        value={nomeBarbearia}
+                        onChange={e => setNomeBarbearia(e.target.value)}
+                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black focus:border-transparent outline-none"
+                        placeholder="Ex: Barbearia Vintage"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 mb-1">Link de Agendamento</label>
+                      <div className="flex items-center">
+                        <span className="px-3 py-2 bg-gray-100 border border-r-0 border-gray-200 rounded-l-xl text-gray-500 text-sm">/b/</span>
+                        <input
+                          type="text"
+                          required
+                          value={slugBarbearia}
+                          onChange={e => setSlugBarbearia(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-'))}
+                          className="w-full px-4 py-2 border border-gray-200 rounded-r-xl focus:ring-2 focus:ring-black focus:border-transparent outline-none"
+                          placeholder="barbearia-vintage"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 
                 <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 space-y-4 mt-6">
                   <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Conta do Admin</h4>

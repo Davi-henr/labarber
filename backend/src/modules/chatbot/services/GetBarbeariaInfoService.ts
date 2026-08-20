@@ -3,13 +3,14 @@ import { AppError } from '../../../shared/errors/AppError';
 
 export class GetBarbeariaInfoService {
   async execute(id_ou_slug: string) {
-    // Na nossa modelagem inicial, não temos 'slug', usaremos o ID da barbearia diretamente.
-    // Futuramente um slug pode ser adicionado.
-    const barbearia = await prisma.barbearia.findUnique({
-      where: { id: id_ou_slug },
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id_ou_slug);
+    
+    const barbearia = await prisma.barbearia.findFirst({
+      where: isUuid ? { id: id_ou_slug } : { slug: id_ou_slug },
       select: {
         id: true,
         nome: true,
+        slug: true,
         logo_url: true,
         cor_primaria: true,
         cor_secundaria: true,

@@ -21,7 +21,15 @@ export class SaasBarbeariasController {
   }
 
   async create(req: Request, res: Response) {
-    const { nome, admin_nome, admin_email, admin_login, admin_senha } = req.body;
+    const { nome, slug, admin_nome, admin_email, admin_login, admin_senha } = req.body;
+
+    // Verificar se a slug já existe
+    const slugExists = await prisma.barbearia.findUnique({
+      where: { slug }
+    });
+    if (slugExists) {
+      return res.status(400).json({ error: 'Este link (slug) já está em uso.' });
+    }
 
     // Verificar se o login ou email já existem
     const usuarioExists = await prisma.usuario.findFirst({
@@ -42,6 +50,7 @@ export class SaasBarbeariasController {
     const barbearia = await prisma.barbearia.create({
       data: {
         nome,
+        slug,
         usuarios: {
           create: {
             nome: admin_nome,
