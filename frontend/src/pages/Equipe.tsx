@@ -221,7 +221,7 @@ export function Equipe() {
                 <div className="flex items-start gap-4 mb-4">
                   <div className="w-12 h-12 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden">
                     {membro.foto_url ? (
-                      <img src={`http://localhost:3333${membro.foto_url}`} alt={membro.nome} className="w-full h-full object-cover" />
+                      <img src={`${import.meta.env.PROD ? '/api' : 'http://localhost:3333'}${membro.foto_url}`} alt={membro.nome} className="w-full h-full object-cover" />
                     ) : (
                       <UserCircle className="text-slate-500" size={28} />
                     )}
@@ -273,7 +273,7 @@ export function Equipe() {
                     {fotoFile ? (
                       <img src={URL.createObjectURL(fotoFile)} alt="Preview" className="w-full h-full object-cover" />
                     ) : currentFotoUrl ? (
-                      <img src={`http://localhost:3333${currentFotoUrl}`} alt="Foto Atual" className="w-full h-full object-cover" />
+                      <img src={`${import.meta.env.PROD ? '/api' : 'http://localhost:3333'}${currentFotoUrl}`} alt="Foto Atual" className="w-full h-full object-cover" />
                     ) : (
                       <UserCircle className="text-slate-400 w-8 h-8" />
                     )}

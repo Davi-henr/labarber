@@ -81,7 +81,7 @@ export function Configuracoes() {
               {logoFile ? (
                 <img src={URL.createObjectURL(logoFile)} alt="Logo Preview" className="w-full h-full object-cover" />
               ) : data?.logo_url ? (
-                <img src={`http://localhost:3333${data.logo_url}`} alt="Logo" className="w-full h-full object-cover" />
+                <img src={`${import.meta.env.PROD ? '/api' : 'http://localhost:3333'}${data.logo_url}`} alt="Logo" className="w-full h-full object-cover" />
               ) : (
                 <Upload className="w-8 h-8 text-slate-400" />
               )}

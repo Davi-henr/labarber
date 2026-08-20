@@ -242,7 +242,7 @@ export function Booking() {
                     >
                       <div className={`w-14 h-14 rounded-full flex items-center justify-center mr-5 shrink-0 transition-colors overflow-hidden ${isSelected ? 'bg-yellow-500/20' : 'bg-white/5'}`}>
                         {b.foto_url ? (
-                          <img src={`http://localhost:3333${b.foto_url}`} alt={b.nome} className="w-full h-full object-cover" />
+                          <img src={`${import.meta.env.PROD ? '/api' : 'http://localhost:3333'}${b.foto_url}`} alt={b.nome} className="w-full h-full object-cover" />
                         ) : (
                           <UserCircle className={isSelected ? "text-yellow-500" : "text-gray-400"} size={32} />
                         )}

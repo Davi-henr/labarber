@@ -38,7 +38,7 @@ export function DashboardLayout() {
         <div className="h-16 flex items-center justify-center border-b border-slate-800">
           <div className="flex items-center gap-2">
             {config?.logo_url ? (
-              <img src={`http://localhost:3333${config.logo_url}`} alt="Logo" className="w-8 h-8 rounded-full object-cover" />
+              <img src={`${import.meta.env.PROD ? '/api' : 'http://localhost:3333'}${config.logo_url}`} alt="Logo" className="w-8 h-8 rounded-full object-cover" />
             ) : (
               <Scissors className="text-white" size={24} />
             )}
@@ -126,7 +126,7 @@ export function DashboardLayout() {
         <header className="md:hidden h-16 bg-white border-b flex items-center justify-between px-4">
           <div className="flex items-center gap-2">
             {config?.logo_url ? (
-              <img src={`http://localhost:3333${config.logo_url}`} alt="Logo" className="w-8 h-8 rounded-full object-cover" />
+              <img src={`${import.meta.env.PROD ? '/api' : 'http://localhost:3333'}${config.logo_url}`} alt="Logo" className="w-8 h-8 rounded-full object-cover" />
             ) : (
               <Scissors className="text-slate-900" size={24} />
             )}

@@ -111,7 +111,7 @@ export function Portfolio() {
             <div key={foto.id} className="bg-white rounded-xl overflow-hidden shadow-sm border group">
               <div className="aspect-[4/5] relative bg-slate-100">
                 <img 
-                  src={`http://localhost:3333${foto.imagem_url}`} 
+                  src={`${import.meta.env.PROD ? '/api' : 'http://localhost:3333'}${foto.imagem_url}`} 
                   alt={foto.legenda || 'Corte'} 
                   className="w-full h-full object-cover"
                 />

@@ -1,3 +1,4 @@
+import { api } from '../contexts/AuthContext';
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -54,10 +55,8 @@ export function LandingPage() {
   useEffect(() => {
     async function loadData() {
       try {
-        const response = await fetch(`http://localhost:3333/chatbot/${barbearia_id}/info`);
-        if (!response.ok) throw new Error('Falha ao buscar dados');
-        const data = await response.json();
-        setInfo(data);
+        const response = await api.get(`/chatbot/${barbearia_id}/info`);
+        setInfo(response.data);
       } catch (error) {
         toast.error('Erro ao carregar barbearia');
       } finally {
@@ -89,7 +88,7 @@ export function LandingPage() {
   }
 
   const { barbearia, barbeiros, portfolio } = info;
-  const logoSrc = barbearia.logo_url ? `http://localhost:3333${barbearia.logo_url}` : null;
+  const logoSrc = barbearia.logo_url ? `${import.meta.env.PROD ? '/api' : 'http://localhost:3333'}${barbearia.logo_url}` : null;
   // const themeColor = barbearia.cor_primaria || '#EAB308'; // default para yellow-500
 
   const handleAgendar = () => {
@@ -260,7 +259,7 @@ export function LandingPage() {
                     <div className="relative overflow-hidden rounded-2xl bg-white/5 shadow-2xl">
                       {barbeiro.foto_url ? (
                         <img 
-                          src={`http://localhost:3333${barbeiro.foto_url}`} 
+                          src={`${import.meta.env.PROD ? '/api' : 'http://localhost:3333'}${barbeiro.foto_url}`} 
                           alt={barbeiro.nome} 
                           className="w-full h-[320px] md:h-[400px] object-cover rounded-2xl shadow-xl grayscale group-[.swiper-slide-active]:grayscale-0 transition-all duration-700"
                         />
@@ -322,7 +321,7 @@ export function LandingPage() {
                   <SwiperSlide key={item.id} className="!w-[220px] sm:!w-[260px] md:!w-[300px] transition-transform duration-300 group">
                     <div className="relative overflow-hidden rounded-2xl bg-white/5 shadow-2xl">
                       <img 
-                        src={`http://localhost:3333${item.imagem_url}`} 
+                        src={`${import.meta.env.PROD ? '/api' : 'http://localhost:3333'}${item.imagem_url}`} 
                         alt={item.legenda || 'Corte'} 
                         className="w-full h-[320px] md:h-[400px] object-cover rounded-2xl shadow-xl grayscale group-[.swiper-slide-active]:grayscale-0 transition-all duration-700"
                       />
