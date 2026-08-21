@@ -151,7 +151,7 @@ export function Dashboard() {
               <Tooltip 
                 cursor={{fill: '#f1f5f9'}}
                 contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}}
-                formatter={(value: any, name: string) => [name === 'faturamento' ? formatCurrency(value) : value, name === 'faturamento' ? 'Faturamento' : 'Cortes']}
+                formatter={(value: any, name: any) => [name === 'faturamento' ? formatCurrency(value) : value, name === 'faturamento' ? 'Faturamento' : 'Cortes']}
               />
               <Legend iconType="circle" wrapperStyle={{fontSize: '14px', paddingTop: '10px'}} />
               <Bar dataKey="faturamento" name="Faturamento" fill="#0f172a" radius={[4, 4, 0, 0]} barSize={32} />
