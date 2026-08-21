@@ -251,7 +251,7 @@ export function Equipe() {
       {/* Modal Novo Barbeiro */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
             <div className="flex items-center justify-between p-6 border-b border-slate-100">
               <h2 className="text-xl font-bold text-slate-900">{editId ? 'Editar Barbeiro' : 'Novo Barbeiro'}</h2>
               <button onClick={closeModal} className="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
@@ -259,7 +259,7 @@ export function Equipe() {
               </button>
             </div>
 
-            <form onSubmit={handleCreateBarbeiro} className="p-6 space-y-5">
+            <form onSubmit={handleCreateBarbeiro} className="p-6 space-y-5 overflow-y-auto">
               
               <div className="bg-blue-50/50 border border-blue-100 rounded-xl p-4 flex gap-3 text-blue-800">
                 <Info size={20} className="shrink-0 mt-0.5" />
