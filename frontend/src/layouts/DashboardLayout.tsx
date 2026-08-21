@@ -7,6 +7,7 @@ import { LogOut, Home, Users, Scissors, Calendar, Clock, Settings, Image as Imag
 interface BarbeariaConfig {
   nome: string;
   logo_url: string | null;
+  cor_primaria: string | null;
 }
 
 export function DashboardLayout() {
@@ -30,7 +31,7 @@ export function DashboardLayout() {
   }, [user]);
 
   const isActive = (path: string) => location.pathname === path;
-  const linkClass = (path: string) => `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive(path) ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`;
+  const linkClass = (path: string) => `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive(path) ? 'bg-black/20 text-white font-medium' : 'text-white/70 hover:bg-black/10 hover:text-white'}`;
 
   return (
     <div className="flex h-screen bg-slate-100 relative">
@@ -45,11 +46,12 @@ export function DashboardLayout() {
 
       {/* Sidebar */}
       <aside className={`
-        fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white flex flex-col transform transition-transform duration-300 ease-in-out
+        fixed inset-y-0 left-0 z-50 w-64 text-white flex flex-col transform transition-transform duration-300 ease-in-out
         md:relative md:translate-x-0
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
-        <div className="h-16 flex items-center justify-between px-4 border-b border-slate-800">
+      `}
+      style={{ backgroundColor: config?.cor_primaria || '#0f172a' }}>
+        <div className="h-16 flex items-center justify-between px-4 border-b border-black/10">
           <div className="flex items-center gap-2">
             {config?.logo_url ? (
               <img src={`${import.meta.env.PROD ? '/api' : 'http://localhost:3333'}${config.logo_url}`} alt="Logo" className="w-8 h-8 rounded-full object-cover" />
@@ -59,7 +61,7 @@ export function DashboardLayout() {
             <h1 className="text-xl font-bold tracking-wider truncate max-w-[140px]">{config?.nome || 'LA BARBER'}</h1>
           </div>
           <button 
-            className="md:hidden text-slate-400 hover:text-white"
+            className="md:hidden text-white/70 hover:text-white"
             onClick={() => setIsMobileMenuOpen(false)}
           >
             <X size={24} />
@@ -120,9 +122,9 @@ export function DashboardLayout() {
           )}
         </nav>
 
-        <div className="p-4 border-t border-slate-800">
+        <div className="p-4 border-t border-black/10">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center font-bold text-white uppercase">
+            <div className="w-10 h-10 rounded-full bg-black/20 flex items-center justify-center font-bold text-white uppercase">
               {user?.nome.charAt(0)}
             </div>
             <div className="flex-1 min-w-0">
@@ -132,7 +134,7 @@ export function DashboardLayout() {
           </div>
           <button 
             onClick={logout}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm text-red-400 hover:bg-slate-800 rounded-lg transition-colors cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm text-red-300 hover:bg-black/20 rounded-lg transition-colors cursor-pointer"
           >
             <LogOut size={16} />
             Sair
