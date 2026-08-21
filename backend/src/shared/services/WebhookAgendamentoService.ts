@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { prisma } from '../../config/prisma';
+import { renderMessageTemplate } from '../utils/renderMessageTemplate';
 
 interface AgendamentoPayload {
   agendamento_id: string;
@@ -11,6 +12,8 @@ interface AgendamentoPayload {
   servico_nome: string;
   data_hora_inicio: string;
   instancia_whatsapp?: string | null;
+  msg_confirmacao_pronta?: string;
+  msg_notificacao_barbeiro_pronta?: string;
 }
 
 export class WebhookAgendamentoService {
@@ -45,6 +48,8 @@ export class WebhookAgendamentoService {
         servico_nome: agendamento.servico.nome,
         data_hora_inicio: agendamento.data_hora_inicio.toISOString(),
         instancia_whatsapp: agendamento.barbearia.instancia_whatsapp,
+        msg_confirmacao_pronta: renderMessageTemplate(agendamento.barbearia.msg_confirmacao, agendamento, 'confirmacao'),
+        msg_notificacao_barbeiro_pronta: renderMessageTemplate(agendamento.barbearia.msg_notificacao_barbeiro, agendamento, 'barbeiro'),
       };
 
       // Dispara o webhook em background (fire-and-forget logic já vai ser aplicada pela forma como chamamos o serviço)

@@ -7,11 +7,14 @@ interface IRequest {
   endereco?: string;
   historia_texto?: string;
   cor_primaria?: string;
+  msg_confirmacao?: string;
+  msg_lembrete?: string;
+  msg_notificacao_barbeiro?: string;
   logo_url?: string;
 }
 
 export class UpdateConfigBarbeariaService {
-  async execute({ barbearia_id, nome, endereco, historia_texto, cor_primaria, logo_url }: IRequest) {
+  async execute({ barbearia_id, nome, endereco, historia_texto, cor_primaria, logo_url, msg_confirmacao, msg_lembrete, msg_notificacao_barbeiro }: IRequest) {
     const barbearia = await prisma.barbearia.findUnique({
       where: { id: barbearia_id }
     });
@@ -27,7 +30,10 @@ export class UpdateConfigBarbeariaService {
         ...(endereco !== undefined && { endereco }),
         ...(historia_texto !== undefined && { historia_texto }),
         ...(cor_primaria !== undefined && { cor_primaria }),
-        ...(logo_url !== undefined && { logo_url })
+        ...(logo_url !== undefined && { logo_url }),
+        ...(msg_confirmacao !== undefined && { msg_confirmacao }),
+        ...(msg_lembrete !== undefined && { msg_lembrete }),
+        ...(msg_notificacao_barbeiro !== undefined && { msg_notificacao_barbeiro })
       }
     });
 

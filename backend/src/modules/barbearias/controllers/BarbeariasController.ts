@@ -34,7 +34,10 @@ export class BarbeariasController {
       nome: z.string().min(1).optional(),
       endereco: z.string().optional(),
       historia_texto: z.string().optional(),
-      cor_primaria: z.string().optional()
+      cor_primaria: z.string().optional(),
+      msg_confirmacao: z.string().optional(),
+      msg_lembrete: z.string().optional(),
+      msg_notificacao_barbeiro: z.string().optional()
     });
 
     const validatedData = updateSchema.parse(request.body);

@@ -2,6 +2,7 @@ import cron from 'node-cron';
 import axios from 'axios';
 import { prisma } from '../../config/prisma';
 import { addHours, addMinutes } from 'date-fns';
+import { renderMessageTemplate } from '../utils/renderMessageTemplate';
 
 export class CronLembreteService {
   public start() {
@@ -62,6 +63,7 @@ export class CronLembreteService {
             servico_nome: agendamento.servico.nome,
             data_hora_inicio: agendamento.data_hora_inicio.toISOString(),
             instancia_whatsapp: agendamento.barbearia.instancia_whatsapp,
+            msg_lembrete_pronta: renderMessageTemplate(agendamento.barbearia.msg_lembrete, agendamento, 'lembrete'),
           };
 
           await axios.post(webhookUrl, payload, { timeout: 10000 });

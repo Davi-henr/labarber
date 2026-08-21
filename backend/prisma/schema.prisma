@@ -38,6 +38,11 @@ model Barbearia {
   horario_fechamento DateTime? @db.Time
   instancia_whatsapp String?   @unique @db.VarChar(100)
   whatsapp_conectado Boolean   @default(false)
+  
+  msg_confirmacao    String?   @db.Text
+  msg_lembrete       String?   @db.Text
+  msg_notificacao_barbeiro String? @db.Text
+
   criado_em          DateTime  @default(now()) @db.Timestamptz
   atualizado_em      DateTime  @updatedAt @db.Timestamptz
 

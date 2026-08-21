@@ -9,6 +9,9 @@ interface ConfiguracoesData {
   endereco: string | null;
   historia_texto: string | null;
   cor_primaria: string | null;
+  msg_confirmacao: string | null;
+  msg_lembrete: string | null;
+  msg_notificacao_barbeiro: string | null;
 }
 
 export function Configuracoes() {
@@ -32,6 +35,18 @@ export function Configuracoes() {
     }
   }
 
+  
+  const insertVariable = (field: 'msg_confirmacao' | 'msg_lembrete' | 'msg_notificacao_barbeiro', variable: string) => {
+    if (!data) return;
+    setData({ ...data, [field]: (data[field] || '') + variable });
+  };
+
+  const VarButton = ({ label, val, field }: { label: string, val: string, field: any }) => (
+    <button type="button" onClick={() => insertVariable(field, val)} className="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-1 rounded transition-colors mr-2 mb-2">
+      {label}
+    </button>
+  );
+  
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!data) return;
@@ -43,6 +58,9 @@ export function Configuracoes() {
       if (data.endereco) formData.append('endereco', data.endereco);
       if (data.historia_texto) formData.append('historia_texto', data.historia_texto);
       if (data.cor_primaria) formData.append('cor_primaria', data.cor_primaria);
+      if (data.msg_confirmacao) formData.append('msg_confirmacao', data.msg_confirmacao);
+      if (data.msg_lembrete) formData.append('msg_lembrete', data.msg_lembrete);
+      if (data.msg_notificacao_barbeiro) formData.append('msg_notificacao_barbeiro', data.msg_notificacao_barbeiro);
       if (logoFile) formData.append('logo', logoFile);
 
       await api.patch('/barbearias/config', formData, {
