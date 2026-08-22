@@ -10,6 +10,9 @@ export class GetConfigBarbeariaService {
         endereco: true,
         historia_texto: true,
         cor_primaria: true,
+        msg_confirmacao: true,
+        msg_lembrete: true,
+        msg_notificacao_barbeiro: true,
       }
     });
 
