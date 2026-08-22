@@ -181,15 +181,15 @@ export function Configuracoes() {
         
         <div className="pt-6 border-t border-slate-200 mt-6">
           <h2 className="text-lg font-bold text-slate-900 mb-4">Mensagens do WhatsApp</h2>
-          <p className="text-sm text-slate-500 mb-6">Personalize as mensagens que serǜo enviadas automaticamente. Use os botes para inserir as variǭveis que o sistema vai trocar soznho.</p>
+          <p className="text-sm text-slate-500 mb-6">Personalize as mensagens que serão enviadas automaticamente. Use os botões para inserir as variáveis que o sistema vai trocar sozinho.</p>
 
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Confirmaǜo de Agendamento (Para o Cliente)</label>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Confirmação de Agendamento (Para o Cliente)</label>
               <div className="mb-2">
                 <VarButton field="msg_confirmacao" label="Nome do Cliente" val="{{cliente_nome}}" />
                 <VarButton field="msg_confirmacao" label="Nome da Barbearia" val="{{barbearia_nome}}" />
-                <VarButton field="msg_confirmacao" label="Nome do Servio" val="{{servico_nome}}" />
+                <VarButton field="msg_confirmacao" label="Nome do Serviço" val="{{servico_nome}}" />
                 <VarButton field="msg_confirmacao" label="Profissional" val="{{barbeiro_nome}}" />
                 <VarButton field="msg_confirmacao" label="Data" val="{{data}}" />
                 <VarButton field="msg_confirmacao" label="Hora" val="{{hora}}" />
@@ -198,7 +198,7 @@ export function Configuracoes() {
                 value={data?.msg_confirmacao || ''}
                 onChange={e => setData(prev => prev ? {...prev, msg_confirmacao: e.target.value} : null)}
                 className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 h-28 resize-none text-sm"
-                placeholder="Ex: Olǭ {{cliente_nome}}! Seu agendamento na {{barbearia_nome}} para {{servico_nome}} estǭ confirmado para o dia {{data}} s {{hora}}."
+                placeholder="Ex: Olá {{cliente_nome}}! Seu agendamento na {{barbearia_nome}} para {{servico_nome}} está confirmado para o dia {{data}} às {{hora}}."
               />
             </div>
 
@@ -207,7 +207,7 @@ export function Configuracoes() {
               <div className="mb-2">
                 <VarButton field="msg_lembrete" label="Nome do Cliente" val="{{cliente_nome}}" />
                 <VarButton field="msg_lembrete" label="Nome da Barbearia" val="{{barbearia_nome}}" />
-                <VarButton field="msg_lembrete" label="Nome do Servio" val="{{servico_nome}}" />
+                <VarButton field="msg_lembrete" label="Nome do Serviço" val="{{servico_nome}}" />
                 <VarButton field="msg_lembrete" label="Data" val="{{data}}" />
                 <VarButton field="msg_lembrete" label="Hora" val="{{hora}}" />
               </div>
@@ -215,16 +215,16 @@ export function Configuracoes() {
                 value={data?.msg_lembrete || ''}
                 onChange={e => setData(prev => prev ? {...prev, msg_lembrete: e.target.value} : null)}
                 className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 h-28 resize-none text-sm"
-                placeholder="Ex: Oi {{cliente_nome}}! Passando para lembrar que voc tem horǭrio de {{servico_nome}} hoje s {{hora}}!"
+                placeholder="Ex: Oi {{cliente_nome}}! Passando para lembrar que você tem horário de {{servico_nome}} hoje às {{hora}}!"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Notificaǜo de Novo Agendamento (Para o Barbeiro)</label>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Notificação de Novo Agendamento (Para o Barbeiro)</label>
               <div className="mb-2">
                 <VarButton field="msg_notificacao_barbeiro" label="Profissional" val="{{barbeiro_nome}}" />
                 <VarButton field="msg_notificacao_barbeiro" label="Nome do Cliente" val="{{cliente_nome}}" />
-                <VarButton field="msg_notificacao_barbeiro" label="Nome do Servio" val="{{servico_nome}}" />
+                <VarButton field="msg_notificacao_barbeiro" label="Nome do Serviço" val="{{servico_nome}}" />
                 <VarButton field="msg_notificacao_barbeiro" label="Data" val="{{data}}" />
                 <VarButton field="msg_notificacao_barbeiro" label="Hora" val="{{hora}}" />
               </div>
@@ -232,7 +232,7 @@ export function Configuracoes() {
                 value={data?.msg_notificacao_barbeiro || ''}
                 onChange={e => setData(prev => prev ? {...prev, msg_notificacao_barbeiro: e.target.value} : null)}
                 className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 h-28 resize-none text-sm"
-                placeholder="Ex: Fala {{barbeiro_nome}}! O cliente {{cliente_nome}} marcou {{servico_nome}} no dia {{data}} s {{hora}}."
+                placeholder="Ex: Fala {{barbeiro_nome}}! O cliente {{cliente_nome}} marcou {{servico_nome}} no dia {{data}} às {{hora}}."
               />
             </div>
           </div>
