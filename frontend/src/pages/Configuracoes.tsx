@@ -195,8 +195,8 @@ export function Configuracoes() {
                 <VarButton field="msg_confirmacao" label="Hora" val="{{hora}}" />
               </div>
               <textarea 
-                value={data.msg_confirmacao || ''}
-                onChange={e => setData({...data, msg_confirmacao: e.target.value})}
+                value={data?.msg_confirmacao || ''}
+                onChange={e => setData(prev => prev ? {...prev, msg_confirmacao: e.target.value} : null)}
                 className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 h-28 resize-none text-sm"
                 placeholder="Ex: Olǭ {{cliente_nome}}! Seu agendamento na {{barbearia_nome}} para {{servico_nome}} estǭ confirmado para o dia {{data}} s {{hora}}."
               />
@@ -212,8 +212,8 @@ export function Configuracoes() {
                 <VarButton field="msg_lembrete" label="Hora" val="{{hora}}" />
               </div>
               <textarea 
-                value={data.msg_lembrete || ''}
-                onChange={e => setData({...data, msg_lembrete: e.target.value})}
+                value={data?.msg_lembrete || ''}
+                onChange={e => setData(prev => prev ? {...prev, msg_lembrete: e.target.value} : null)}
                 className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 h-28 resize-none text-sm"
                 placeholder="Ex: Oi {{cliente_nome}}! Passando para lembrar que voc tem horǭrio de {{servico_nome}} hoje s {{hora}}!"
               />
@@ -229,8 +229,8 @@ export function Configuracoes() {
                 <VarButton field="msg_notificacao_barbeiro" label="Hora" val="{{hora}}" />
               </div>
               <textarea 
-                value={data.msg_notificacao_barbeiro || ''}
-                onChange={e => setData({...data, msg_notificacao_barbeiro: e.target.value})}
+                value={data?.msg_notificacao_barbeiro || ''}
+                onChange={e => setData(prev => prev ? {...prev, msg_notificacao_barbeiro: e.target.value} : null)}
                 className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 h-28 resize-none text-sm"
                 placeholder="Ex: Fala {{barbeiro_nome}}! O cliente {{cliente_nome}} marcou {{servico_nome}} no dia {{data}} s {{hora}}."
               />
