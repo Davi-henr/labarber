@@ -14,6 +14,8 @@ export function WhatsAppConfig() {
   const barbeariaId = user?.barbearia_id;
   const [status, setStatus] = useState<WhatsAppStatus | null>(null);
   const [qrCode, setQrCode] = useState<string | null>(null);
+  const [pairingCode, setPairingCode] = useState<string | null>(null);
+  const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
 
@@ -22,7 +24,9 @@ export function WhatsAppConfig() {
       const response = await api.get(`/whatsapp/${barbeariaId}/status`);
       setStatus(response.data);
       if (response.data.isConnected) {
-        setQrCode(null); // Clear QR code if already connected
+        setQrCode(null);
+      setPairingCode(null);
+        setPairingCode(null);
       }
     } catch (error) {
       console.error('Erro ao buscar status do WhatsApp', error);
@@ -35,7 +39,7 @@ export function WhatsAppConfig() {
     fetchStatus();
     // Poll status every 5 seconds if we have a QR code generated to detect scan
     let interval: number;
-    if (qrCode) {
+    if (qrCode || pairingCode) {
       interval = setInterval(fetchStatus, 5000);
     }
     return () => {
@@ -46,8 +50,16 @@ export function WhatsAppConfig() {
   const handleGenerateQR = async () => {
     setGenerating(true);
     try {
-      const response = await api.post(`/whatsapp/${barbeariaId}/create`);
-      if (response.data.qrcode) {
+      const numLimpo = phoneNumber.replace(/\D/g, '');
+      if (!numLimpo) {
+        alert('Por favor, insira o nmero do WhatsApp (ex: 11999999999)');
+        setGenerating(false);
+        return;
+      }
+      const response = await api.post(`/whatsapp/${barbeariaId}/create`, { number: '55' + numLimpo });
+      if (response.data.pairingCode) {
+        setPairingCode(response.data.pairingCode);
+      } else if (response.data.qrcode) {
         setQrCode(response.data.qrcode);
       } else {
         fetchStatus(); // Might already be connected
@@ -103,7 +115,26 @@ export function WhatsAppConfig() {
                   <CheckCircle size={16} className="text-green-500 mr-2" />
                   <span className="text-green-400 font-medium">Conectado ({status.instanceName})</span>
                 </>
-              ) : (
+
+              {pairingCode ? (
+                <div className="flex flex-col items-center justify-center p-8 bg-slate-50 rounded-2xl border border-slate-100 mb-6">
+                  <p className="text-amber-600 font-bold mb-2">Cdigo de Pareamento Gerado!</p>
+                  <p className="text-slate-600 text-center mb-6">Abra o WhatsApp no seu celular, v em "Aparelhos Conectados" > "Conectar com nmero de telefone" e digite o cdigo abaixo:</p>
+                  
+                  <div className="bg-white px-8 py-6 rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 flex items-center justify-center mb-6">
+                    <span className="text-5xl font-black text-slate-900 tracking-widest">{pairingCode}</span>
+                  </div>
+
+                  <p className="text-sm text-slate-500 text-center mb-4">Aguardando conexo...</p>
+                  <button 
+                    onClick={() => setPairingCode(null)}
+                    className="text-slate-500 hover:text-slate-900 text-sm font-medium transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              ) : qrCode ? (
+
                 <>
                   <span className="w-3 h-3 rounded-full bg-red-500 mr-2 inline-block"></span>
                   <span className="text-red-400 font-medium">Desconectado</span>
@@ -121,28 +152,26 @@ export function WhatsAppConfig() {
               <p className="text-gray-300 mb-6">
                 Sua barbearia já está disparando mensagens automaticamente para seus clientes através do n8n.
               </p>
-              <button
-                onClick={handleDeleteInstance}
-                className="w-full py-3 bg-red-600/20 text-red-500 hover:bg-red-600/30 border border-red-900/50 rounded-lg flex items-center justify-center font-semibold transition"
-              >
-                <Trash2 size={18} className="mr-2" /> Desconectar Número
-              </button>
-            </>
-          ) : (
-            <>
-              {!qrCode ? (
-                <>
-                  <p className="text-gray-300 mb-6">
-                    Clique abaixo para gerar o QR Code. O sistema criará uma instância isolada apenas para a sua barbearia.
-                  </p>
-                  <button
+              
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Nmero do WhatsApp (com DDD)</label>
+                    <input
+                      type="text"
+                      placeholder="Ex: 11999999999"
+                      value={phoneNumber}
+                      onChange={e => setPhoneNumber(e.target.value)}
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900"
+                    />
+                  </div>
+                  <button 
                     onClick={handleGenerateQR}
                     disabled={generating}
-                    className="w-full py-3 bg-amber-500 text-black hover:bg-amber-400 rounded-lg flex items-center justify-center font-bold transition disabled:opacity-50"
+                    className="flex items-center justify-center w-full px-6 py-3 bg-slate-900 text-white rounded-xl hover:bg-slate-800 disabled:opacity-50 transition-colors font-medium shadow-lg shadow-slate-900/20"
                   >
-                    {generating ? <RefreshCw size={18} className="animate-spin mr-2" /> : <QrCode size={18} className="mr-2" />}
-                    {generating ? 'Gerando Instância...' : 'Conectar WhatsApp'}
+                    {generating ? <RefreshCw size={18} className="animate-spin mr-2" /> : <Smartphone size={18} className="mr-2" />}
+                    {generating ? 'Conectando...' : 'Conectar via Nmero'}
                   </button>
+
                 </>
               ) : (
                 <div className="flex flex-col items-center animate-in fade-in zoom-in duration-300">

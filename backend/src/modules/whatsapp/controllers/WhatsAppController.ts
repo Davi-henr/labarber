@@ -15,9 +15,10 @@ export class WhatsAppController {
 
   async createInstance(req: Request, res: Response): Promise<Response> {
     const { barbearia_id } = req.params;
+    const { number } = req.body || {};
     try {
       const service = new ManageWhatsAppInstanceService();
-      const result = await service.createInstance(barbearia_id);
+      const result = await service.createInstance(barbearia_id, number);
       return res.json(result);
     } catch (error: any) {
       return res.status(400).json({ error: error.message });

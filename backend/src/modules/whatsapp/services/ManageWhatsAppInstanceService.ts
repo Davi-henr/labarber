@@ -73,7 +73,7 @@ export class ManageWhatsAppInstanceService {
     }
   }
 
-  async createInstance(barbearia_id: string): Promise<{ qrcode: string }> {
+  async createInstance(barbearia_id: string, number?: string): Promise<{ qrcode?: string, pairingCode?: string }> {
     let barbearia = await prisma.barbearia.findUnique({ where: { id: barbearia_id } });
     if (!barbearia) throw new Error('Barbearia não encontrada');
 
@@ -99,6 +99,7 @@ export class ManageWhatsAppInstanceService {
           {
             instanceName,
             qrcode: true,
+            number: number || undefined,
             integration: "WHATSAPP-BAILEYS",
             reject_call: false
           },
@@ -108,8 +109,10 @@ export class ManageWhatsAppInstanceService {
         // Evolution V2 usually returns the QR code directly upon creation if requested
         const data = createRes.data;
         const qrcodeData = data?.qrcode?.base64 || data?.base64 || data?.qrcode || data?.urlcode;
+        const pairingCode = data?.qrcode?.pairingCode || data?.pairingCode;
+        if (pairingCode) return { pairingCode };
         if (qrcodeData) {
-          return { qrcode: typeof qrcodeData === 'string' ? qrcodeData : qrcodeData.base64 || '' };
+          return { qrcode: typeof qrcodeData === 'string' ? qrcodeData : qrcodeData.base64 || '', pairingCode: data?.qrcode?.pairingCode || data?.pairingCode };
         }
       } catch (createError: any) {
         console.error('Error creating instance:', createError.response?.data || createError.message);
@@ -131,7 +134,7 @@ export class ManageWhatsAppInstanceService {
          if (typeof qrcodeData !== 'string' && qrcodeData.base64) {
              qrcodeData = qrcodeData.base64;
          }
-         return { qrcode: qrcodeData };
+         return { qrcode: qrcodeData, pairingCode: data?.qrcode?.pairingCode || data?.pairingCode };
       }
       
       return { qrcode: '' }; // Already connected or no QR returned
