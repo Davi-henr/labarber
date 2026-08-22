@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth, api } from '../contexts/AuthContext';
-import { QrCode, Trash2, CheckCircle, RefreshCw, Smartphone } from 'lucide-react';
+import { Trash2, CheckCircle, RefreshCw, Smartphone } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface WhatsAppStatus {
@@ -12,6 +12,7 @@ interface WhatsAppStatus {
 export function WhatsAppConfig() {
   const { user } = useAuth();
   const barbeariaId = user?.barbearia_id;
+  
   const [status, setStatus] = useState<WhatsAppStatus | null>(null);
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [pairingCode, setPairingCode] = useState<string | null>(null);
@@ -25,7 +26,6 @@ export function WhatsAppConfig() {
       setStatus(response.data);
       if (response.data.isConnected) {
         setQrCode(null);
-      setPairingCode(null);
         setPairingCode(null);
       }
     } catch (error) {
@@ -37,7 +37,6 @@ export function WhatsAppConfig() {
 
   useEffect(() => {
     fetchStatus();
-    // Poll status every 5 seconds if we have a QR code generated to detect scan
     let interval: number;
     if (qrCode || pairingCode) {
       interval = setInterval(fetchStatus, 5000);
@@ -45,12 +44,12 @@ export function WhatsAppConfig() {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [barbeariaId, qrCode]);
+  }, [barbeariaId, qrCode, pairingCode]);
 
   const handleGenerateQR = async () => {
     setGenerating(true);
     try {
-      const numLimpo = phoneNumber.replace(/\D/g, '');
+      const numLimpo = phoneNumber.replace(/\\D/g, '');
       if (!numLimpo) {
         alert('Por favor, insira o nmero do WhatsApp (ex: 11999999999)');
         setGenerating(false);
@@ -62,7 +61,7 @@ export function WhatsAppConfig() {
       } else if (response.data.qrcode) {
         setQrCode(response.data.qrcode);
       } else {
-        fetchStatus(); // Might already be connected
+        fetchStatus();
       }
     } catch (error) {
       console.error('Erro ao gerar QR code', error);
@@ -79,9 +78,10 @@ export function WhatsAppConfig() {
     try {
       await api.delete(`/whatsapp/${barbeariaId}/delete`);
       setQrCode(null);
+      setPairingCode(null);
       await fetchStatus();
     } catch (error) {
-      console.error('Erro ao deletar instância', error);
+      console.error('Erro ao deletar instncia', error);
       alert('Falha ao desconectar.');
       setLoading(false);
     }
@@ -96,7 +96,7 @@ export function WhatsAppConfig() {
       className="p-6 max-w-4xl mx-auto"
     >
       <h1 className="text-3xl font-bold text-white mb-2">WhatsApp do SaaS</h1>
-      <p className="text-gray-400 mb-8">Conecte o número da sua barbearia para ativar notificações automáticas de agendamento.</p>
+      <p className="text-gray-400 mb-8">Conecte o nmero da sua barbearia para ativar notificaes automticas de agendamento.</p>
 
       <div className="bg-[#1C1C1C] border border-gray-800 rounded-xl p-8 shadow-2xl flex flex-col items-center">
         
@@ -107,7 +107,7 @@ export function WhatsAppConfig() {
           </div>
           <div>
             <h2 className="text-xl font-semibold text-white">
-              Status da Conexão
+              Status da Conexo
             </h2>
             <div className="flex items-center mt-1">
               {status?.isConnected ? (
@@ -115,26 +115,7 @@ export function WhatsAppConfig() {
                   <CheckCircle size={16} className="text-green-500 mr-2" />
                   <span className="text-green-400 font-medium">Conectado ({status.instanceName})</span>
                 </>
-
-              {pairingCode ? (
-                <div className="flex flex-col items-center justify-center p-8 bg-slate-50 rounded-2xl border border-slate-100 mb-6">
-                  <p className="text-amber-600 font-bold mb-2">Cdigo de Pareamento Gerado!</p>
-                  <p className="text-slate-600 text-center mb-6">Abra o WhatsApp no seu celular, v em "Aparelhos Conectados" > "Conectar com nmero de telefone" e digite o cdigo abaixo:</p>
-                  
-                  <div className="bg-white px-8 py-6 rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 flex items-center justify-center mb-6">
-                    <span className="text-5xl font-black text-slate-900 tracking-widest">{pairingCode}</span>
-                  </div>
-
-                  <p className="text-sm text-slate-500 text-center mb-4">Aguardando conexo...</p>
-                  <button 
-                    onClick={() => setPairingCode(null)}
-                    className="text-slate-500 hover:text-slate-900 text-sm font-medium transition-colors"
-                  >
-                    Cancelar
-                  </button>
-                </div>
-              ) : qrCode ? (
-
+              ) : (
                 <>
                   <span className="w-3 h-3 rounded-full bg-red-500 mr-2 inline-block"></span>
                   <span className="text-red-400 font-medium">Desconectado</span>
@@ -150,46 +131,80 @@ export function WhatsAppConfig() {
           {status?.isConnected ? (
             <>
               <p className="text-gray-300 mb-6">
-                Sua barbearia já está disparando mensagens automaticamente para seus clientes através do n8n.
+                Sua barbearia j est disparando mensagens automaticamente para seus clientes atravs do n8n.
               </p>
               
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Nmero do WhatsApp (com DDD)</label>
+              <button
+                onClick={handleDeleteInstance}
+                className="flex items-center justify-center w-full px-6 py-3 bg-red-500/10 text-red-400 rounded-xl hover:bg-red-500/20 transition-colors font-medium border border-red-500/20"
+              >
+                <Trash2 size={18} className="mr-2" />
+                Desconectar e Deletar
+              </button>
+            </>
+          ) : (
+            <>
+              {!qrCode && !pairingCode ? (
+                <div className="w-full">
+                  <p className="text-gray-400 mb-6 text-sm">
+                    Clique abaixo para gerar o cdigo. O sistema criar uma instncia isolada apenas para a sua barbearia.
+                  </p>
+                  
+                  <div className="mb-4 text-left">
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Nmero do WhatsApp (com DDD)</label>
                     <input
                       type="text"
                       placeholder="Ex: 11999999999"
                       value={phoneNumber}
                       onChange={e => setPhoneNumber(e.target.value)}
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900"
+                      className="w-full px-4 py-3 bg-black/50 border border-gray-700 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500"
                     />
                   </div>
+                  
                   <button 
                     onClick={handleGenerateQR}
                     disabled={generating}
-                    className="flex items-center justify-center w-full px-6 py-3 bg-slate-900 text-white rounded-xl hover:bg-slate-800 disabled:opacity-50 transition-colors font-medium shadow-lg shadow-slate-900/20"
+                    className="flex items-center justify-center w-full px-6 py-3 bg-amber-500 text-black rounded-xl hover:bg-amber-400 disabled:opacity-50 transition-colors font-semibold shadow-lg shadow-amber-500/20"
                   >
                     {generating ? <RefreshCw size={18} className="animate-spin mr-2" /> : <Smartphone size={18} className="mr-2" />}
                     {generating ? 'Conectando...' : 'Conectar via Nmero'}
                   </button>
-
-                </>
+                </div>
+              ) : pairingCode ? (
+                <div className="flex flex-col items-center w-full animate-in fade-in zoom-in duration-300">
+                  <p className="text-amber-400 font-medium mb-4">Cdigo de Pareamento Gerado!</p>
+                  <p className="text-gray-400 text-sm mb-6">No WhatsApp, v em "Aparelhos Conectados" &gt; "Conectar com nmero de telefone" e digite:</p>
+                  
+                  <div className="bg-white px-8 py-6 rounded-2xl shadow-xl w-full flex items-center justify-center mb-6">
+                    <span className="text-4xl font-black text-black tracking-widest">{pairingCode}</span>
+                  </div>
+                  
+                  <p className="text-sm text-gray-500 mt-2 animate-pulse">Aguardando pareamento...</p>
+                  
+                  <button
+                    onClick={() => setPairingCode(null)}
+                    className="mt-6 text-sm text-gray-400 hover:text-white transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                </div>
               ) : (
                 <div className="flex flex-col items-center animate-in fade-in zoom-in duration-300">
-                  <p className="text-amber-400 font-medium mb-4">Abra o WhatsApp e escaneie o código:</p>
+                  <p className="text-amber-400 font-medium mb-4">Abra o WhatsApp e escaneie o cdigo:</p>
                   <div className="bg-white p-4 rounded-xl shadow-lg">
-                    {qrCode.startsWith('http') ? (
-                      <img src={qrCode} alt="WhatsApp QR Code" className="w-64 h-64 object-contain" />
-                    ) : qrCode.startsWith('data:image') ? (
-                       <img src={qrCode} alt="WhatsApp QR Code" className="w-64 h-64 object-contain" />
+                    {qrCode!.startsWith('http') ? (
+                      <img src={qrCode || ''} alt="WhatsApp QR Code" className="w-64 h-64 object-contain" />
+                    ) : qrCode!.startsWith('data:image') ? (
+                       <img src={qrCode || ''} alt="WhatsApp QR Code" className="w-64 h-64 object-contain" />
                     ) : (
-                       <img src={`data:image/png;base64,${qrCode}`} alt="WhatsApp QR Code" className="w-64 h-64 object-contain" />
+                       <img src={`data:image/png;base64,${qrCode || ''}`} alt="WhatsApp QR Code" className="w-64 h-64 object-contain" />
                     )}
                   </div>
-                  <p className="text-sm text-gray-500 mt-6 animate-pulse">Aguardando leitura do código...</p>
+                  <p className="text-sm text-gray-500 mt-6 animate-pulse">Aguardando leitura do cdigo...</p>
                   
                   <button
                     onClick={() => setQrCode(null)}
-                    className="mt-4 text-sm text-gray-400 hover:text-white"
+                    className="mt-4 text-sm text-gray-400 hover:text-white transition-colors"
                   >
                     Cancelar
                   </button>
