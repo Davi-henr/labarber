@@ -46,6 +46,15 @@ export function WhatsAppConfig() {
     };
   }, [barbeariaId, qrCode, pairingCode]);
 
+  
+  const formatWhatsApp = (value: string) => {
+    const numbers = value.replace(/\D/g, '');
+    if (numbers.length === 0) return '';
+    if (numbers.length <= 2) return `(${numbers}`;
+    if (numbers.length <= 7) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
+    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
+  };
+
   const handleGenerateQR = async () => {
     setGenerating(true);
     try {
@@ -154,9 +163,9 @@ export function WhatsAppConfig() {
                     <label className="block text-sm font-medium text-gray-300 mb-1">Nmero do WhatsApp (com DDD)</label>
                     <input
                       type="text"
-                      placeholder="Ex: 11999999999"
+                      placeholder="Ex: (11) 99999-9999"
                       value={phoneNumber}
-                      onChange={e => setPhoneNumber(e.target.value)}
+                      onChange={e => setPhoneNumber(formatWhatsApp(e.target.value))}
                       className="w-full px-4 py-3 bg-black/50 border border-gray-700 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500"
                     />
                   </div>
