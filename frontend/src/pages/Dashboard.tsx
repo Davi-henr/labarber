@@ -15,6 +15,11 @@ export function Dashboard() {
   const [equipe, setEquipe] = useState<{id: string, nome: string}[]>([]);
   const [barbeiroSelecionado, setBarbeiroSelecionado] = useState<string>('');
   const [graficoAno, setGraficoAno] = useState<number>(new Date().getFullYear());
+  const [dataInicio, setDataInicio] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
+  const [dataFim, setDataFim] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
+
+  const isHoje = dataInicio === format(new Date(), 'yyyy-MM-dd') && dataFim === format(new Date(), 'yyyy-MM-dd');
+  const labelPeriodo = isHoje ? 'Hoje' : 'no Período';
 
   useEffect(() => {
     if (user?.role === 'ADMIN') {
@@ -33,7 +38,7 @@ export function Dashboard() {
     if (!barbeiroSelecionado) return;
     try {
       setLoading(true);
-      const response = await api.get(`/dashboard?barbeiro_id=${barbeiroSelecionado}&ano=${graficoAno}`);
+      const response = await api.get(`/dashboard?barbeiro_id=${barbeiroSelecionado}&ano=${graficoAno}&data_inicio=${dataInicio}&data_fim=${dataFim}`);
       setData(response.data);
     } catch (error) {
       console.error(error);
@@ -44,7 +49,7 @@ export function Dashboard() {
 
   useEffect(() => {
     fetchDashboard();
-  }, [barbeiroSelecionado, graficoAno]);
+  }, [barbeiroSelecionado, graficoAno, dataInicio, dataFim]);
 
   if (loading || !data) {
     return <div className="flex h-full items-center justify-center text-slate-500">Carregando dashboard...</div>;
@@ -92,7 +97,7 @@ export function Dashboard() {
           <div className="w-12 h-12 bg-sky-50 rounded-xl flex items-center justify-center mb-4">
             <CalendarCheck className="text-sky-600" size={24} />
           </div>
-          <p className="text-slate-500 font-medium mb-1">Agendados Hoje</p>
+          <p className="text-slate-500 font-medium mb-1">{`Agendados ${labelPeriodo}`}</p>
           <h3 className="text-3xl font-bold text-slate-900">{metricasBarbeiro.agendadosHoje}</h3>
         </div>
         
@@ -100,7 +105,7 @@ export function Dashboard() {
           <div className="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center mb-4">
             <CalendarX className="text-red-500" size={24} />
           </div>
-          <p className="text-slate-500 font-medium mb-1">Cancelados Hoje</p>
+          <p className="text-slate-500 font-medium mb-1">{`Cancelados ${labelPeriodo}`}</p>
           <h3 className="text-3xl font-bold text-slate-900">{metricasBarbeiro.canceladosHoje}</h3>
         </div>
 
@@ -108,7 +113,7 @@ export function Dashboard() {
           <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mb-4">
             <Scissors className="text-indigo-600" size={24} />
           </div>
-          <p className="text-slate-500 font-medium mb-1">Cortes Hoje</p>
+          <p className="text-slate-500 font-medium mb-1">{`Cortes ${labelPeriodo}`}</p>
           <h3 className="text-3xl font-bold text-slate-900">{metricasBarbeiro.cortesHoje}</h3>
         </div>
         
@@ -186,7 +191,7 @@ export function Dashboard() {
           <div className="absolute -right-6 -top-6 w-24 h-24 bg-slate-800 rounded-full blur-2xl"></div>
           <div className="relative z-10">
             <p className="text-slate-400 font-medium mb-1 flex items-center gap-2">
-              <TrendingUp size={18} /> Faturamento de Hoje
+              <TrendingUp size={18} /> Faturamento {labelPeriodo}
             </p>
             <h3 className="text-3xl font-bold">{formatCurrency(metricasGlobais?.faturamentoHoje || 0)}</h3>
           </div>
@@ -209,7 +214,7 @@ export function Dashboard() {
 
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-100 bg-slate-50">
-          <h3 className="font-bold text-slate-900">Ranking da Equipe (Hoje)</h3>
+          <h3 className="font-bold text-slate-900">Ranking da Equipe ({labelPeriodo})</h3>
         </div>
         <div className="p-0">
           <table className="w-full text-left border-collapse">
@@ -266,7 +271,7 @@ export function Dashboard() {
       </div>
 
       {user?.role === 'ADMIN' ? (
-        <>
+        <div className="flex flex-col md:flex-row justify-between items-center w-full gap-4 mb-4">
           <div className="flex bg-slate-100 p-1 rounded-xl w-full max-w-sm">
             <button
               onClick={() => setActiveTab('operacao')}
@@ -281,12 +286,43 @@ export function Dashboard() {
               Visão da Barbearia
             </button>
           </div>
-          
-          {activeTab === 'operacao' ? renderMinhaOperacao() : renderVisaoGeral()}
-        </>
+          <div className="flex items-center gap-2 bg-white p-1 rounded-xl border border-slate-200 shadow-sm overflow-x-auto w-full md:w-auto">
+            <input 
+              type="date" 
+              value={dataInicio} 
+              onChange={e => setDataInicio(e.target.value)}
+              className="px-2 py-1.5 bg-transparent text-sm font-medium text-slate-700 focus:outline-none"
+            />
+            <span className="text-slate-400 text-sm">até</span>
+            <input 
+              type="date" 
+              value={dataFim} 
+              onChange={e => setDataFim(e.target.value)}
+              className="px-2 py-1.5 bg-transparent text-sm font-medium text-slate-700 focus:outline-none"
+            />
+          </div>
+        </div>
       ) : (
-        renderMinhaOperacao()
+        <div className="flex justify-end w-full mb-4">
+          <div className="flex items-center gap-2 bg-white p-1 rounded-xl border border-slate-200 shadow-sm overflow-x-auto w-full md:w-auto">
+            <input 
+              type="date" 
+              value={dataInicio} 
+              onChange={e => setDataInicio(e.target.value)}
+              className="px-2 py-1.5 bg-transparent text-sm font-medium text-slate-700 focus:outline-none"
+            />
+            <span className="text-slate-400 text-sm">até</span>
+            <input 
+              type="date" 
+              value={dataFim} 
+              onChange={e => setDataFim(e.target.value)}
+              className="px-2 py-1.5 bg-transparent text-sm font-medium text-slate-700 focus:outline-none"
+            />
+          </div>
+        </div>
       )}
+      
+      {user?.role === 'ADMIN' && activeTab === 'visao_geral' ? renderVisaoGeral() : renderMinhaOperacao()}
     </div>
   );
 }
