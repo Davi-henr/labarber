@@ -58,7 +58,7 @@ export function WhatsAppConfig() {
   const handleGenerateQR = async () => {
     setGenerating(true);
     try {
-      const numLimpo = phoneNumber.replace(/\\D/g, '');
+      const numLimpo = phoneNumber.replace(/\D/g, '');
       if (!numLimpo) {
         alert('Por favor, insira o nmero do WhatsApp (ex: 11999999999)');
         setGenerating(false);
