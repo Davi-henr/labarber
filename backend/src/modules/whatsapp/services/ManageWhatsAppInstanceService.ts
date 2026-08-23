@@ -109,10 +109,10 @@ export class ManageWhatsAppInstanceService {
         // Evolution V2 usually returns the QR code directly upon creation if requested
         const data = createRes.data;
         const qrcodeData = data?.qrcode?.base64 || data?.base64 || data?.qrcode || data?.urlcode;
-        const pairingCode = data?.qrcode?.pairingCode || data?.pairingCode;
+        const pairingCode = data?.qrcode?.pairingCode || data?.pairingCode || data?.code;
         if (pairingCode) return { pairingCode };
         if (qrcodeData) {
-          return { qrcode: typeof qrcodeData === 'string' ? qrcodeData : qrcodeData.base64 || '', pairingCode: data?.qrcode?.pairingCode || data?.pairingCode };
+          return { qrcode: typeof qrcodeData === 'string' ? qrcodeData : qrcodeData.base64 || '', pairingCode: data?.qrcode?.pairingCode || data?.pairingCode || data?.code || data?.code };
         }
       } catch (createError: any) {
         console.error('Error creating instance:', createError.response?.data || createError.message);
@@ -123,7 +123,7 @@ export class ManageWhatsAppInstanceService {
     // 3. Request connection to get QR code
     try {
       const connectResponse = await axios.get(
-        `${this.baseUrl}/instance/connect/${instanceName}`,
+        `${this.baseUrl}/instance/connect/${instanceName}${number ? '?number=' + number : ''}`,
         { headers: this.headers }
       );
       
