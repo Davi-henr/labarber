@@ -25,9 +25,7 @@ export function DashboardLayout() {
         console.error('Erro ao carregar config da barbearia', error);
       }
     }
-    if (user?.role === 'ADMIN') {
-      loadConfig();
-    }
+    if (user) { loadConfig(); }
   }, [user]);
 
   const isActive = (path: string) => location.pathname === path;
