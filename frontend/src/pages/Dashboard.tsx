@@ -137,6 +137,7 @@ export function Dashboard() {
       </div>
 
 
+      {user?.role === 'ADMIN' && graficoAnual && (
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mt-6">
         <div className="flex justify-between items-center mb-6">
           <h3 className="font-bold text-slate-900">Desempenho Financeiro e Cortes ({graficoAno})</h3>
@@ -165,6 +166,7 @@ export function Dashboard() {
           </ResponsiveContainer>
         </div>
       </div>
+      )}
 
     </div>
   );
