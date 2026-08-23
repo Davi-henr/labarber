@@ -10,8 +10,13 @@ export class DashboardController {
     const targetBarbeiroId = barbeiro_id ? String(barbeiro_id) : user_id;
 
     const hoje = new Date();
-    const inicioHoje = startOfDay(hoje);
-    const fimHoje = endOfDay(hoje);
+    let inicioFiltro = startOfDay(hoje);
+    let fimFiltro = endOfDay(hoje);
+
+    if (data_inicio && data_fim) {
+      inicioFiltro = startOfDay(new Date(`${data_inicio}T00:00:00`));
+      fimFiltro = endOfDay(new Date(`${data_fim}T00:00:00`));
+    }
     
     const inicioMes = startOfMonth(hoje);
     const fimMes = endOfMonth(hoje);
@@ -121,37 +126,30 @@ export class DashboardController {
         }
       });
 
-      const mesesNomes = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-      const mesesMap = new Map<number, { mes: string; cortes: number; faturamento: number }>();
-      
-      for (let i = 0; i < 12; i++) {
-        mesesMap.set(i, { mes: mesesNomes[i], cortes: 0, faturamento: 0 });
-      }
+      const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+      graficoAnual = meses.map(mes => ({ mes, faturamento: 0, cortes: 0 }));
 
-      for (const ag of agendamentosAno) {
-        const mesIndex = ag.data_hora_inicio.getMonth();
-        const data = mesesMap.get(mesIndex)!;
-        data.cortes += 1;
-        data.faturamento += Number(ag.valor_cobrado);
-      }
-
-      graficoAnual = Array.from(mesesMap.values());
+      agendamentosAno.forEach(ag => {
+        const mesIndex = new Date(ag.data_hora_inicio).getMonth();
+        graficoAnual[mesIndex].faturamento += Number(ag.valor_cobrado);
+        graficoAnual[mesIndex].cortes += 1;
+      });
     }
 
     return res.json({
-      proximoCliente: proximoClienteResult ? {
-        nome: proximoClienteResult.cliente.nome,
-        whatsapp: proximoClienteResult.cliente.whatsapp,
-        servico: proximoClienteResult.servico.nome,
-        hora: proximoClienteResult.data_hora_inicio
-      } : null,
       metricasBarbeiro: {
-        cortesHoje: cortesHojeBarbeiro,
-        canceladosHoje: canceladosHojeBarbeiro,
         agendadosHoje: totalAgendadosHojeBarbeiro,
+        canceladosHoje: canceladosHojeBarbeiro,
+        cortesHoje: cortesHojeBarbeiro,
         comissaoHoje,
         cortesMes: cortesMesBarbeiro
       },
+      proximoCliente: proximoClienteResult ? {
+        nome: proximoClienteResult.cliente.nome,
+        whatsapp: proximoClienteResult.cliente.whatsapp,
+        hora: proximoClienteResult.data_hora_inicio,
+        servico: proximoClienteResult.servico.nome
+      } : null,
       metricasGlobais,
       ranking,
       graficoAnual
