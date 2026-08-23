@@ -98,7 +98,7 @@ export class ManageWhatsAppInstanceService {
           `${this.baseUrl}/instance/create`,
           {
             instanceName,
-            qrcode: true,
+            qrcode: number ? false : true,
             number: number || undefined,
             integration: "WHATSAPP-BAILEYS",
             reject_call: false
