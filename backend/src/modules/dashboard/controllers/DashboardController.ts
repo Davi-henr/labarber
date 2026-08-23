@@ -5,7 +5,7 @@ import { startOfDay, endOfDay, startOfMonth, endOfMonth, startOfYear, endOfYear,
 export class DashboardController {
   async index(req: Request, res: Response) {
     const { barbearia_id, id: user_id, role } = req.user;
-    const { barbeiro_id, ano } = req.query;
+    const { barbeiro_id, ano, data_inicio, data_fim } = req.query;
 
     const targetBarbeiroId = barbeiro_id ? String(barbeiro_id) : user_id;
 
@@ -26,7 +26,7 @@ export class DashboardController {
       where: {
         barbearia_id,
         barbeiro_id: targetBarbeiroId,
-        data_hora_inicio: { gte: inicioHoje, lte: fimHoje }
+        data_hora_inicio: { gte: inicioFiltro, lte: fimFiltro }
       }
     });
 
@@ -70,7 +70,7 @@ export class DashboardController {
       const todosHoje = await prisma.agendamento.findMany({
         where: {
           barbearia_id,
-          data_hora_inicio: { gte: inicioHoje, lte: fimHoje }
+          data_hora_inicio: { gte: inicioFiltro, lte: fimFiltro }
         },
         include: {
           barbeiro: true
